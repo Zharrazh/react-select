@@ -96,43 +96,22 @@
 .dropZoneWrapper{
   align-self: stretch;
   position: relative;
-  width: 0;
-  z-index:-1;
-
-  &.checkMode{
-    z-index: 1;
-  }
 
   .dropZone{
+    z-index: -1;
     position: absolute;
-    left: 0;
-    bottom: 0;
-    top:0;
-    width: 50px;
-    &.display{background-color: #8d8d8d}
+    height: 100%;
+    width: 20px;
+    &.checkMode{
+      z-index: 1;
+    }
+    &.display{
+      position: static;
+      background-color: #8d8d8d;
+      border-radius: 2px;
+    }
   }
 }
-.selectedOptionDropZone{
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  top:0;
-  width: 50px;
-  z-index: -1;
-
-  &.overed{
-    z-index:1;
-  }
-  &.showed{
-    position: static;
-    width: 50px;
-    background-color: #8d8d8d;
-    border-radius: 2px;
-  }
-}
-.selectedOptionWrapper{
-  position: relative;
-  display: flex;
 
 
   .selectedOptionItem{
@@ -171,5 +150,4 @@
     }
 
   }
-}
 

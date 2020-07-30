@@ -1,7 +1,7 @@
 import "./Multiselect.scss"
 import cn from "classnames"
 
-import React, {ChangeEvent, FunctionComponent, useCallback, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, FunctionComponent, useRef, useState} from "react";
 
 
 export type Option = {
@@ -21,7 +21,6 @@ export const Multiselect : FunctionComponent<MultiselectProps> = props => {
     const [query, setQuery] = useState<string>("")
     const [isFocused,setFocused] = useState<boolean>(false)
     const [checkOutsideClicks, setCheckOutsideClicks] = useState<boolean>(false)
-    const [dropZones,setDropZones] = useState< React.RefObject<HTMLDivElement>[]> ([])
     const [draggableItem,setDraggableItem] = useState<Option|null> (null)
     const [isDraggingNow, setDraggingNow] = useState<boolean>(false)
 
@@ -108,22 +107,23 @@ export const Multiselect : FunctionComponent<MultiselectProps> = props => {
         },0)
     }
 
-    const registerDropzone = useCallback((node:React.RefObject<HTMLDivElement>) => {
-        setDropZones(dropZones=>[...dropZones, node])
-    },[])
-
+    const handleOnDragEnd= () => {
+        if(isDraggingNow) setDraggingNow(false)
+    }
     return (
         <div className={"multiselect"} onClick={handleOnMultiselectClick}>
             <div className={cn("multiselect__select", {"focused":isFocused})} onFocus={handleOnFocus} onBlur={handleOnBlur} tabIndex={0}>
                 <div className="multiselect__select__input">
                     {selectedOptions.map(option => {
-                        return <SelectedOptionItem option={option}
+
+                        return<>
+                            <Dropzone isDraggingNow={isDraggingNow} onDropItem={createOnDropItemCallback(option)}/>
+                            <SelectedOptionItem option={option}
                                                    onDeleteClick={createOnDeleteClickSelectedItemCallback(option)}
-                                                   registerDropzone={registerDropzone}
-                                                   dropZones={dropZones}
-                                                   onDropItem={createOnDropItemCallback(option)}
                                                    onDragStart={createOnDragStartItemCallback(option)}
-                        />
+                                                   onDragEnd={handleOnDragEnd}
+                            />
+                        </>
                     })}
                     <Dropzone isDraggingNow={isDraggingNow} onDropItem={handleOnDropItemLast}/>
                     <input type="text" placeholder={"Select..."} onInput={handleChangeQuery} onClick={handleInputClick} ref={inputText} />
@@ -185,66 +185,34 @@ const OptionListItem: FunctionComponent<OptionListItemProps> = ({option,onClick}
 type SelectedOptionItemProps = {
     option: Option;
     onDeleteClick: () => void;
-    dropZones: React.RefObject<HTMLDivElement>[];
-    registerDropzone: (node:React.RefObject<HTMLDivElement>) => void;
-    onDropItem: () => void;
     onDragStart: () => void;
+    onDragEnd: () => void;
 }
-const SelectedOptionItem : FunctionComponent<SelectedOptionItemProps> = ({option,onDeleteClick ,dropZones,registerDropzone, onDropItem, onDragStart}) => {
-    const dropZoneRef = useRef<HTMLDivElement>(null)
-    const itemRef  =useRef<HTMLDivElement> (null)
-    useEffect(()=>{
-        registerDropzone(dropZoneRef)
-        console.log("register dropzone")
-    },[registerDropzone])
+const SelectedOptionItem : FunctionComponent<SelectedOptionItemProps> = ({option,onDeleteClick , onDragStart, onDragEnd}) => {
+    const itemRef =useRef<HTMLDivElement> (null)
 
     const handleOnDragStart =  () => {
         onDragStart()
         setTimeout(()=>{
             itemRef.current!.classList.add("hidden")
-            dropZones.forEach(dz=> {
-                if(dz.current) dz.current.classList.add("overed")
-            })
         },0)
     }
     const handleOnDragEnd =  () => {
+        onDragEnd()
         setTimeout(()=>{
             itemRef.current!.classList.remove("hidden")
-            dropZones.forEach(dz=> {
-                if(dz.current)dz.current.classList.remove("overed")
-            })
         },0)
     }
 
-    const handleOnDragOver = (event:any) => {
-        event.preventDefault()
-    }
-
-    const handleOnDragEnter = () => {
-        dropZoneRef.current!.classList.add("showed")
-    }
-    const handleOnDragLeave = () => {
-        dropZoneRef.current!.classList.remove("showed")
-    }
-
-    const handleOnDropItem = () =>{
-        onDropItem()
-        dropZoneRef.current!.classList.remove("showed")
-    }
-
-
-    return <div className={"selectedOptionWrapper"}>
-        <div className={"selectedOptionDropZone"} ref={dropZoneRef}
-             onDragEnter={handleOnDragEnter} onDragLeave={handleOnDragLeave}
-             onDragOver={handleOnDragOver} onDrop={handleOnDropItem}/>
-        <div className={"selectedOptionItem"} ref={itemRef} draggable={true} onDragStart={handleOnDragStart} onDragEnd={handleOnDragEnd} >
+    return<div className={"selectedOptionItem"} ref={itemRef} draggable={true} onDragStart={handleOnDragStart} onDragEnd={handleOnDragEnd} >
             <div className="selectedOptionItem__title">{option.title}</div>
             <div className="selectedOptionItem__deleteBtn" onClick={onDeleteClick}>
                 <i className="fas fa-times"/>
             </div>
         </div>
-    </div>
 }
+
+
 
 type DropzoneProps = {
     isDraggingNow:boolean
@@ -258,17 +226,20 @@ const Dropzone:FunctionComponent<DropzoneProps> = ({ onDropItem, isDraggingNow})
     }
     const handleOnDragEnter = () => {
         if (!isDisplay) setDisplay(true)
+        console.log("enter")
     }
     const handleOnDragLeave = () => {
         if (isDisplay) setDisplay(false)
+        console.log("leave")
     }
     const handleOnDrop= () =>{
         onDropItem()
         if (isDisplay) setDisplay(false)
+        console.log("drop")
     }
 
-    return  <div className={cn("dropZoneWrapper", {checkMode:isDraggingNow})}>
-        <div className={cn("dropZone", {display:isDisplay})} onDragOver={handleOnDragOver}
+    return  <div className={"dropZoneWrapper"}>
+        <div className={cn("dropZone", {"display":isDisplay,"checkMode":isDraggingNow})} onDragOver={handleOnDragOver}
              onDragEnter={handleOnDragEnter} onDragLeave={handleOnDragLeave} onDrop={handleOnDrop}
         />
     </div>
