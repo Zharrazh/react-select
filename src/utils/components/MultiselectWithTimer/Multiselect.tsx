@@ -108,7 +108,6 @@ export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defau
     const handleOnFocus = () => {
         clearTimeout(focusTimer)
         if(!isFocused) {
-            console.log("set focused true")
             setFocused(true)
         }
     }
@@ -116,7 +115,6 @@ export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defau
         focusTimer = setTimeout(()=>{
             if (isFocused) setFocused(false)
             if (isExpanded) setExpanded(false)
-            console.log("set focused false")
         },0)
     }
 
@@ -239,16 +237,13 @@ const Dropzone:FunctionComponent<DropzoneProps> = ({ onDropItem, isDraggingNow})
     }
     const handleOnDragEnter = () => {
         if (!isDisplay) setDisplay(true)
-        console.log("enter")
     }
     const handleOnDragLeave = () => {
         if (isDisplay) setDisplay(false)
-        console.log("leave")
     }
     const handleOnDrop= () =>{
         onDropItem()
         if (isDisplay) setDisplay(false)
-        console.log("drop")
     }
 
     return  <div className={"dropZoneWrapper"}>
