@@ -1,32 +1,44 @@
 import "./Multiselect.scss"
 import cn from "classnames"
 
-import React, {ChangeEvent, FunctionComponent, useRef, useState} from "react";
+import React, {ChangeEvent, FunctionComponent, useEffect, useRef, useState} from "react";
 
 
 export type Option = {
-    readonly title: string
+    readonly title: string;
+    readonly id: number;
 }
 
 type MultiselectProps = {
-    readonly options : Option[]
+    readonly options : Option[];
+    readonly defaultSelectedOptions: Option[];
+    onChange: (selectedOption:Option[]) => void;
 }
 
-export const Multiselect : FunctionComponent<MultiselectProps> = props => {
+export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defaultSelectedOptions,onChange}) => {
 
 
 
     const [isExpanded, setExpanded] = useState<boolean>(false)
-    const [selectedOptions, setSelectedOptions] = useState<Option[]>([])
+    const [selectedOptions, setSelectedOptions] = useState<Option[]>(defaultSelectedOptions)
+    useEffect(()=>{
+        setSelectedOptions(defaultSelectedOptions)
+    },[defaultSelectedOptions])
+    useEffect(()=>{
+        onChange(selectedOptions)
+    },[selectedOptions,onChange])
+
     const [query, setQuery] = useState<string>("")
     const [isFocused,setFocused] = useState<boolean>(false)
     const [checkOutsideClicks, setCheckOutsideClicks] = useState<boolean>(false)
     const [draggableItem,setDraggableItem] = useState<Option|null> (null)
     const [isDraggingNow, setDraggingNow] = useState<boolean>(false)
 
+
+
     const inputText = useRef<HTMLInputElement>(null)
 
-    const unselectedOptions = props.options.filter(option =>{
+    const unselectedOptions = options.filter(option =>{
         return (!selectedOptions.includes(option))
     })
     let showedOptions: Option[]
@@ -43,6 +55,7 @@ export const Multiselect : FunctionComponent<MultiselectProps> = props => {
     const createOnClickListItemCallback = (option:Option) => () =>{
         setSelectedOptions([...selectedOptions, option])
         inputText.current!.focus()
+
     }
     const createOnDeleteClickSelectedItemCallback = (option:Option) => () =>{
         setSelectedOptions(selectedOptions.filter(o=>o!==option))
