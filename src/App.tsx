@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.scss';
-import {Multiselect} from "./utils/components/MultiselectWithTimer/Multiselect"
+import {Multiselect, Option} from "./utils/components/MultiselectWithTimer/Multiselect"
 
 
 export const App:React.FC = () =>  {
@@ -12,13 +12,15 @@ export const App:React.FC = () =>  {
         {id:4,title:"amet"},
         {id:5,title:"consectetur"},
     ]
+
+    const handleOnChange = (selectedOption:Option[])=>{
+        console.log(selectedOption)
+    }
   return (
       <div className={"App"}>
         <Multiselect options={options}
-                     defaultSelectedOptions={[options[1],options[2]]}
-                     onChange={(selectedOption)=>{
-                         console.log(selectedOption)
-                     }}
+                     //defaultSelectedOptions={[options[1],options[2]]}
+                     onChange={handleOnChange}
         />
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. At cupiditate deleniti distinctio doloribus et
                 fugiat ipsum itaque, maxime numquam veniam? Ad, consectetur deserunt impedit nisi odio odit vel. Fuga,

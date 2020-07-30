@@ -11,18 +11,17 @@ export type Option = {
 
 type MultiselectProps = {
     readonly options : Option[];
-    readonly defaultSelectedOptions: Option[];
+    readonly defaultSelectedOptions?: Option[];
     onChange: (selectedOption:Option[]) => void;
 }
 
 export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defaultSelectedOptions,onChange}) => {
 
-
-
     const [isExpanded, setExpanded] = useState<boolean>(false)
-    const [selectedOptions, setSelectedOptions] = useState<Option[]>(defaultSelectedOptions)
+    const [selectedOptions, setSelectedOptions] = useState<Option[]>(defaultSelectedOptions||[])
+
     useEffect(()=>{
-        setSelectedOptions(defaultSelectedOptions)
+        if(defaultSelectedOptions)setSelectedOptions(defaultSelectedOptions)
     },[defaultSelectedOptions])
     useEffect(()=>{
         onChange(selectedOptions)
@@ -133,6 +132,7 @@ export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defau
                                                    onDeleteClick={createOnDeleteClickSelectedItemCallback(option)}
                                                    onDragStart={createOnDragStartItemCallback(option)}
                                                    onDragEnd={handleOnDragEnd}
+                                                key={option.id}
                             />
                         </>
                     })}
@@ -148,7 +148,7 @@ export const Multiselect : FunctionComponent<MultiselectProps> = ({options,defau
             </div>
             {isExpanded && showedOptions.length!==0 && <div className="multiselect__list" onFocus={handleOnFocus} onBlur={handleOnBlur} tabIndex={0}>
                 {showedOptions.map(opinion => {
-                    return <OptionListItem option={opinion} onClick={createOnClickListItemCallback(opinion)} key={opinion.title} />
+                    return <OptionListItem option={opinion} onClick={createOnClickListItemCallback(opinion)} key={opinion.id} />
                 })}
             </div>}
 
