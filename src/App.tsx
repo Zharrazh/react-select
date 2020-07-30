@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.scss';
-import {Multiselect} from "./utils/components/Multiselect/Multiselect"
+import {Multiselect} from "./utils/components/MultiselectWithTimer/Multiselect"
 
 
 export const App:React.FC = () =>  {
